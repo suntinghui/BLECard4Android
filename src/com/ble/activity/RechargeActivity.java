@@ -36,6 +36,15 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 		balanceView.setText("");
 	}
 
+	/*
+	protected void onDestroy(){
+		super.onDestroy();
+		
+		unbindService(BLEClient.getInstance().mServiceConnection);
+		BLEClient.getInstance().mBluetoothLeService = null;
+	}
+	*/
+
 	@Override
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_recharge) {

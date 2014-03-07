@@ -9,18 +9,21 @@
         android:layout_centerInParent="true"
         android:orientation="vertical"
         android:paddingLeft="30dip"
-        android:paddingRight="30dip" >
+        android:paddingRight="30dip"
+         >
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:visibility="gone" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:gravity="center"
-                android:text="余       额：" />
+                android:text="余       额：" 
+                />
 
             <TextView
                 android:id="@+id/tv_balance"

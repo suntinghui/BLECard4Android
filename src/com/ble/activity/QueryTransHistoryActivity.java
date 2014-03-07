@@ -30,6 +30,15 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 
 		this.queryHistory();
 	}
+	
+	/*
+	protected void onDestroy(){
+		super.onDestroy();
+		
+		unbindService(BLEClient.getInstance().mServiceConnection);
+		BLEClient.getInstance().mBluetoothLeService = null;
+	}
+	*/
 
 	private void queryHistory() {
 		byte[] tempData = new byte[350];

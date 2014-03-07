@@ -29,8 +29,8 @@ public class CatalogActivity extends BaseActivity {
 	
 	private static final int REQUEST_ENABLE_BT = 1;
 
-	private Integer[] imageIds = { R.drawable.catalog_1_button, R.drawable.catalog_2_button, R.drawable.catalog_3_button };
-	private String[] titles = { "余额查询", "充值", "明细查询", };
+	private Integer[] imageIds = { R.drawable.catalog_1_button, R.drawable.catalog_2_button, R.drawable.catalog_3_button ,R.drawable.catalog_4_button, R.drawable.catalog_5_button, R.drawable.catalog_6_button };
+	private String[] titles = { "余额查询", "充值", "明细查询", "网络余额查询", "手机缴费", "网络充值" };
 
 	private GridView gridView = null;
 	private CatalogAdapter adapter = null;
@@ -114,6 +114,11 @@ public class CatalogActivity extends BaseActivity {
 				Intent intent2 = new Intent(CatalogActivity.this, QueryTransHistoryActivity.class);
 				startActivity(intent2);
 				break;
+			case 3:
+			case 4:
+			case 5:
+				Toast.makeText(CatalogActivity.this, "暂未实现此功能", Toast.LENGTH_SHORT).show();
+				break;
 			}
 		}
 
@@ -123,17 +128,7 @@ public class CatalogActivity extends BaseActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-			if ((System.currentTimeMillis() - exitTimeMillis) > 2000) {
-				Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-				exitTimeMillis = System.currentTimeMillis();
-			} else {
-				ArrayList<BaseActivity> list = BaseActivity.getAllActiveActivity();
-				for (BaseActivity activity : list) {
-					activity.finish();
-				}
-
-				System.exit(0);
-			}
+			finish();
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
@@ -185,4 +180,5 @@ public class CatalogActivity extends BaseActivity {
 			return convertView;
 		}
 	}
+	
 }

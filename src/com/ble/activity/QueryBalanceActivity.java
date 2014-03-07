@@ -29,6 +29,20 @@ public class QueryBalanceActivity extends BaseActivity implements OnClickListene
 		queryBtn.setOnClickListener(this);
 
 	}
+	
+	protected void onPause(){
+		super.onPause();
+		//unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
+	}
+	
+	/*
+	protected void onDestroy(){
+		super.onDestroy();
+		
+		unbindService(BLEClient.getInstance().mServiceConnection);
+		BLEClient.getInstance().mBluetoothLeService = null;
+	}
+	*/
 
 	@Override
 	public void onClick(View view) {

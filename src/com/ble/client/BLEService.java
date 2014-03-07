@@ -136,7 +136,7 @@ public class BLEService extends Service {
 
 		@Override
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-			Log.e(TAG, "onServicesDiscovered");
+			Log.e(TAG, "onServicesDiscovered--"+status);
 
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				if (null == identifiedService) {
