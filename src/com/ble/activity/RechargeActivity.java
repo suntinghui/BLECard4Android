@@ -32,7 +32,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 		moneyEdit = (EditText) this.findViewById(R.id.et_money);
 		queryBtn = (Button) this.findViewById(R.id.btn_recharge);
 		queryBtn.setOnClickListener(this);
-		
+
 		balanceView.setText("");
 	}
 
@@ -42,7 +42,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 			byte[] value1 = new byte[] { (byte) 0x07, (byte) 0x00, (byte) 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10, (byte) 0x01, (byte) 0x15, (byte) 0x80, (byte) 0x7a, (byte) 0x00, (byte) 0x00, (byte) 0x10, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
 
 			// 充值金额
-			double rechargeValue = Double.parseDouble(moneyEdit.getText().toString()) * 100;
+			double rechargeValue = Integer.parseInt(moneyEdit.getText().toString()) * 100;
 			byte[] rechargeByte = new byte[3];
 			rechargeByte[0] = (byte) (rechargeValue / (256 * 256));
 			rechargeByte[1] = (byte) (rechargeValue % (256 * 256) / 256);
@@ -79,19 +79,23 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 				String val2 = String.format("%2d", money % 100);
 
 				balanceView.setText(val1 + "." + val2 + " 元");
-			} 
+			}
 
 		} else if (id == BLETransferTypeEnum.TRANSFER_RECHARGE.getId()) {
 			boolean state = (Boolean) map.get("state");
-			if (state){
+			if (state) {
 				Toast.makeText(this, "充值成功！", Toast.LENGTH_SHORT).show();
-				
-//				byte[] value = new byte[] { (byte) 0x07, (byte) 0x00, (byte) 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10, (byte) 0x01, (byte) 0x05, (byte) 0x80, (byte) 0x5c, (byte) 0x00, (byte) 0x02, (byte) 0x04 };
-//				BLEClient.getInstance().sendData(this, this, BLETransferTypeEnum.TRANSFER_QUERYBALANCE, value);
+
+				// byte[] value = new byte[] { (byte) 0x07, (byte) 0x00, (byte)
+				// 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10,
+				// (byte) 0x01, (byte) 0x05, (byte) 0x80, (byte) 0x5c, (byte)
+				// 0x00, (byte) 0x02, (byte) 0x04 };
+				// BLEClient.getInstance().sendData(this, this,
+				// BLETransferTypeEnum.TRANSFER_QUERYBALANCE, value);
 			} else {
 				Toast.makeText(this, "充值失败！", Toast.LENGTH_SHORT).show();
 			}
-			
+
 		}
 	}
 }

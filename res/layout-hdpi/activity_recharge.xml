@@ -50,7 +50,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:paddingLeft="30dip" />
+                android:paddingLeft="30dip"
+                android:inputType="number"
+                android:maxLength="4" />
         </LinearLayout>
 
         <Button
