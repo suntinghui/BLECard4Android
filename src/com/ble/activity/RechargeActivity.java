@@ -48,6 +48,11 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 	@Override
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_recharge) {
+			if(moneyEdit.getText().length() == 0){
+				Toast.makeText(RechargeActivity.this, "请输入金额", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
 			byte[] value1 = new byte[] { (byte) 0x07, (byte) 0x00, (byte) 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10, (byte) 0x01, (byte) 0x15, (byte) 0x80, (byte) 0x7a, (byte) 0x00, (byte) 0x00, (byte) 0x10, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
 
 			// 充值金额
