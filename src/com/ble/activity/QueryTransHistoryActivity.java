@@ -30,15 +30,29 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 
 		this.queryHistory();
 	}
-	
-	/*
-	protected void onDestroy(){
-		super.onDestroy();
-		
-		unbindService(BLEClient.getInstance().mServiceConnection);
-		BLEClient.getInstance().mBluetoothLeService = null;
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		registerReceiver(BLEClient.getInstance().mGattUpdateReceiver, BLEClient.getInstance().makeGattUpdateIntentFilter());
 	}
-	*/
+
+	protected void onPause() {
+		super.onPause();
+		unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
+	}
+
+	protected void onDestroy() {
+		super.onDestroy();
+
+		try {
+			unbindService(BLEClient.getInstance().mServiceConnection);
+			BLEClient.getInstance().mBluetoothLeService = null;
+		} catch (Exception e) {
+
+		}
+	}
 
 	private void queryHistory() {
 		byte[] tempData = new byte[350];
@@ -70,7 +84,8 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 	@Override
 	public void bleAction(Object obj) {
 		@SuppressWarnings("unchecked")
-		ArrayList<TransferModel> modelList = (ArrayList<TransferModel>) obj;
+		HashMap<String, Object> map = (HashMap<String, Object>) obj;
+		ArrayList<TransferModel> modelList = (ArrayList<TransferModel>) map.get("list");
 
 		for (TransferModel model : modelList) {
 			HashMap<String, String> tempMap = new HashMap<String, String>();

@@ -1,5 +1,7 @@
 package com.ble.util;
 
+import java.util.Locale;
+
 public class ByteUtil {
 
 	public static byte[] cancat(byte[] a, byte[] b) {
@@ -53,7 +55,7 @@ public class ByteUtil {
 			}
 			stringBuilder.append(hv);
 		}
-		return stringBuilder.toString();
+		return stringBuilder.toString().toUpperCase();
 
 	}
 
@@ -108,6 +110,6 @@ public class ByteUtil {
 			}
 			sb.append(Integer.toString(intTmp, 16));
 		}
-		return sb.toString();
+		return sb.toString().toUpperCase();
 	}
 }

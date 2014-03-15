@@ -18,6 +18,7 @@
         <activity android:name=".activity.QueryBalanceActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.QueryTransHistoryActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.RechargeActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RegistrationActivity" android:screenOrientation="portrait"/>
         
         <service android:name=".client.BLEService" android:enabled="true"/>
         

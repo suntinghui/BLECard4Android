@@ -1,7 +1,5 @@
 package com.ble.activity;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -30,7 +28,7 @@ public class CatalogActivity extends BaseActivity {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	private Integer[] imageIds = { R.drawable.catalog_1_button, R.drawable.catalog_2_button, R.drawable.catalog_3_button ,R.drawable.catalog_4_button, R.drawable.catalog_5_button, R.drawable.catalog_6_button };
-	private String[] titles = { "余额查询", "充值", "明细查询", "网络余额查询", "手机缴费", "网络充值" };
+	private String[] titles = { "余额查询", "充值", "明细查询", "网络余额查询", "手机缴费", "注册" };
 
 	private GridView gridView = null;
 	private CatalogAdapter adapter = null;
@@ -114,10 +112,15 @@ public class CatalogActivity extends BaseActivity {
 				Intent intent2 = new Intent(CatalogActivity.this, QueryTransHistoryActivity.class);
 				startActivity(intent2);
 				break;
+				
 			case 3:
 			case 4:
-			case 5:
 				Toast.makeText(CatalogActivity.this, "暂未实现此功能", Toast.LENGTH_SHORT).show();
+				break;
+				
+			case 5:
+				Intent intent5 = new Intent(CatalogActivity.this, RegistrationActivity.class);
+				startActivity(intent5);
 				break;
 			}
 		}

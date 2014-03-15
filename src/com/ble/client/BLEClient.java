@@ -18,6 +18,8 @@ import android.util.Log;
 
 public class BLEClient {
 
+	private final static String TAG = BLEClient.class.getSimpleName();
+
 	public static BLEClient instance = null;
 
 	public BLEService mBluetoothLeService;
@@ -47,32 +49,27 @@ public class BLEClient {
 	}
 
 	public BLEClient() {
-		ApplicationEnvironment
-				.getInstance()
-				.getApplication()
-				.registerReceiver(mGattUpdateReceiver,
-						makeGattUpdateIntentFilter());
 	}
 
 	// 只负责初始化组织数据
-	public void sendData(Context context, BELActionListener listener,
-			BLETransferTypeEnum type, byte[] value) {
+	public void sendData(Context context, BELActionListener listener, BLETransferTypeEnum type, byte[] value) {
+		Log.e(TAG, "================================================");
+		
+		Log.e(TAG, "sendData........");
+
 		currentType = type;
 		bleListener = listener;
 		byteValue = value;
 
 		Intent gattServiceIntent = new Intent(context, BLEService.class);
-		context.bindService(gattServiceIntent, mServiceConnection,
-				Context.BIND_AUTO_CREATE);
+		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	public ServiceConnection mServiceConnection = new ServiceConnection() {
 
 		@Override
-		public void onServiceConnected(ComponentName componentName,
-				IBinder service) {
-			mBluetoothLeService = ((BLEService.LocalBinder) service)
-					.getService();
+		public void onServiceConnected(ComponentName componentName, IBinder service) {
+			mBluetoothLeService = ((BLEService.LocalBinder) service).getService();
 			mBluetoothLeService.connect();
 		}
 
@@ -117,8 +114,7 @@ public class BLEClient {
 
 	private void sendDisConnRequest() {
 		Log.e("Req Dis", "发送断开请求命令...");
-		byte[] disValue = new byte[] { (byte) 0x10, (byte) 0x01, (byte) 0x00,
-				(byte) 0x02, (byte) 0x02, (byte) 0x00 };
+		byte[] disValue = new byte[] { (byte) 0x10, (byte) 0x01, (byte) 0x00, (byte) 0x02, (byte) 0x02, (byte) 0x00 };
 
 		byteList.clear();
 		byteList.add(disValue);
@@ -156,8 +152,7 @@ public class BLEClient {
 			byte[] tempByte = new byte[dataLength];
 			System.arraycopy(tempData, 0, tempByte, 0, dataLength);
 
-			Log.e("TEMP SEND", "---" + ByteUtil.bytesToHexString(tempByte)
-					+ "---");
+			Log.e("TEMP SEND", "---" + ByteUtil.bytesToHexString(tempByte) + "---");
 
 			byteList.add(tempByte);
 		}
@@ -209,22 +204,18 @@ public class BLEClient {
 			if (temp < ((revLength + (19 - 16 - 1)) / 19 + 1)) {
 				this.sendRevRequest();
 			} else {
-				if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYBALANCE
-						.getId()) {
-					int money = (revData[5] & 0xFF) * 256 * 256
-							+ (revData[6] & 0xFF) * 256 + (revData[7] & 0xFF);
+				if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYBALANCE.getId()) {
+					int money = (revData[5] & 0xFF) * 256 * 256 + (revData[6] & 0xFF) * 256 + (revData[7] & 0xFF);
 					Log.e("money", money + "");
 					int state = (revData[8] & 0xFF) * 256 + (revData[9] & 0xFF);
 
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("type", currentType.getId());
 					map.put("money", Integer.valueOf(money));
-					map.put("state",
-							Boolean.valueOf(state == 0x90 * 256 + 0x00));
+					map.put("state", Boolean.valueOf(state == 0x90 * 256 + 0x00));
 					bleListener.bleAction(map);
 
-				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYHISTORY
-						.getId()) {
+				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYHISTORY.getId()) {
 					ArrayList<TransferModel> modelList = new ArrayList<TransferModel>();
 
 					int start = 3;
@@ -232,33 +223,20 @@ public class BLEClient {
 						int curLength = revData[start] & 0xFF;
 						if (curLength == 0x19) {
 							TransferModel model = new TransferModel();
-							model.setNum(revData[start + 1] & 0xFF * 256
-									+ revData[start + 2] & 0xFF);
-							model.setTouzhi(revData[start + 3] & 0xFF * 256
-									* 256 + revData[start + 4] & 0xFF * 256
-									+ revData[start + 5] & 0xFF);
-							model.setJiaoyi(revData[start + 6] & 0xFF * 256
-									* 256 * 256 + revData[start + 7] & 0xFF
-									* 256 * 256 + revData[start + 8] & 0xFF
-									* 256 + revData[start + 9] & 0xFF);
+							model.setNum((revData[start + 1] & 0xFF) * 256 + revData[start + 2] & 0xFF);
+							model.setTouzhi((revData[start + 3] & 0xFF) * 256 * 256 + (revData[start + 4] & 0xFF) * 256 + revData[start + 5] & 0xFF);
+							model.setJiaoyi((revData[start + 6] & 0xFF) * 256 * 256 * 256 + (revData[start + 7] & 0xFF) * 256 * 256 + (revData[start + 8] & 0xFF) * 256 + revData[start + 9] & 0xFF);
 							model.setType(revData[start + 10] & 0xFF);
-							model.setZhongduan(String.format(
-									"%.2x%.2x%.2x%.2x%.2x%.2x",
-									revData[start + 11] & 0xFF,
-									revData[start + 12] & 0xFF,
-									revData[start + 13] & 0xFF,
-									revData[start + 14] & 0xFF,
-									revData[start + 15] & 0xFF,
-									revData[start + 16] & 0xFF));
-							model.setDate(revData[start + 17] & 0xFF * 256
-									* 256 * 256 + revData[start + 18] & 0xFF
-									* 256 * 256 + revData[start + 19] & 0xFF
-									* 256 + revData[start + 20] & 0xFF);
-							model.setTime(revData[start + 21] & 0xFF * 256
-									* 256 + revData[start + 22] & 0xFF * 256
-									+ revData[start + 23] & 0xFF);
+							// model.setZhongduan(String.format("%.2x%.2x%.2x%.2x%.2x%.2x",
+							// revData[start + 11] & 0xFF, revData[start + 12] &
+							// 0xFF, revData[start + 13] & 0xFF, revData[start +
+							// 14] & 0xFF, revData[start + 15] & 0xFF,
+							// revData[start + 16] & 0xFF));
+							model.setDate((revData[start + 17] & 0xFF) * 256 * 256 * 256 + (revData[start + 18] & 0xFF) * 256 * 256 + (revData[start + 19] & 0xFF) * 256 + revData[start + 20] & 0xFF);
+							model.setTime((revData[start + 21] & 0xFF) * 256 * 256 + (revData[start + 22] & 0xFF) * 256 + revData[start + 23] & 0xFF);
 
 							modelList.add(model);
+
 							start += curLength + 1;
 						} else {
 							break;
@@ -271,14 +249,12 @@ public class BLEClient {
 						bleListener.bleAction(map);
 					}
 
-				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_RECHARGE
-						.getId()) {
+				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_RECHARGE.getId()) {
 					int state = (revData[4] & 0xFF) * 256 + (revData[5] & 0xFF);
 
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("type", currentType.getId());
-					map.put("state",
-							Boolean.valueOf(state == 0x90 * 256 + 0x00));
+					map.put("state", Boolean.valueOf(state == 0x90 * 256 + 0x00));
 					bleListener.bleAction(map);
 				}
 
@@ -317,7 +293,7 @@ public class BLEClient {
 		}
 	};
 
-	private static IntentFilter makeGattUpdateIntentFilter() {
+	public IntentFilter makeGattUpdateIntentFilter() {
 		final IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(Constants.ACTION_GATT_CONNECTED);
 		intentFilter.addAction(Constants.ACTION_GATT_DISCONNECTED);
