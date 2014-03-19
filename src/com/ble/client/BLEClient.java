@@ -3,6 +3,7 @@ package com.ble.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.ble.activity.BaseActivity;
 import com.ble.model.TransferModel;
 import com.ble.util.ByteUtil;
 
@@ -12,8 +13,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.location.GpsStatus.Listener;
+import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 public class BLEClient {
@@ -22,7 +24,7 @@ public class BLEClient {
 
 	public static BLEClient instance = null;
 
-	public BLEService mBluetoothLeService;
+	public BLEService mBLEService;
 
 	private BLETransferTypeEnum currentType;
 	private BELActionListener bleListener;
@@ -49,33 +51,56 @@ public class BLEClient {
 	}
 
 	public BLEClient() {
+		Intent gattServiceIntent = new Intent(ApplicationEnvironment.getInstance().getApplication(), BLEService.class);
+		ApplicationEnvironment.getInstance().getApplication().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+		
+		ApplicationEnvironment.getInstance().getApplication().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 	}
 
 	// 只负责初始化组织数据
-	public void sendData(Context context, BELActionListener listener, BLETransferTypeEnum type, byte[] value) {
+	public void sendData(BELActionListener listener, BLETransferTypeEnum type, byte[] value) {
 		Log.e(TAG, "================================================");
-		
 		Log.e(TAG, "sendData........");
 
 		currentType = type;
 		bleListener = listener;
 		byteValue = value;
+		
+		new BLETask().execute();
+	}
+	
+	class BLETask extends AsyncTask<Object, Object, Object> {
+		
+		@Override
+		protected void onPreExecute() {
+			BaseActivity.getTopActivity().showDialog(BaseActivity.PROGRESS_DIALOG, "正在操作请稍候");
+			super.onPreExecute();
+		}
 
-		Intent gattServiceIntent = new Intent(context, BLEService.class);
-		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+		@Override
+		protected Object doInBackground(Object... arg0) {
+			try {
+				Looper.prepare();
+				mBLEService.connect();
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			return null;
+		}
+		
 	}
 
 	public ServiceConnection mServiceConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
-			mBluetoothLeService = ((BLEService.LocalBinder) service).getService();
-			mBluetoothLeService.connect();
+			mBLEService = ((BLEService.LocalBinder) service).getService();
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName componentName) {
-			mBluetoothLeService = null;
+			mBLEService = null;
 		}
 	};
 
@@ -101,14 +126,14 @@ public class BLEClient {
 
 			nowSendState = 1;
 
-			mBluetoothLeService.writeCharacteristic(tempValue);
+			mBLEService.writeCharacteristic(tempValue);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void sendRevRequest() {
-		mBluetoothLeService.writeCharacteristic(new byte[] { temp });
+		mBLEService.writeCharacteristic(new byte[] { temp });
 		temp++;
 	}
 
@@ -214,6 +239,8 @@ public class BLEClient {
 					map.put("money", Integer.valueOf(money));
 					map.put("state", Boolean.valueOf(state == 0x90 * 256 + 0x00));
 					bleListener.bleAction(map);
+					
+					BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
 
 				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYHISTORY.getId()) {
 					ArrayList<TransferModel> modelList = new ArrayList<TransferModel>();
@@ -247,6 +274,8 @@ public class BLEClient {
 						map.put("list", modelList);
 						map.put("state", Boolean.valueOf(true));
 						bleListener.bleAction(map);
+						
+						BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
 					}
 
 				} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_RECHARGE.getId()) {
@@ -256,6 +285,8 @@ public class BLEClient {
 					map.put("type", currentType.getId());
 					map.put("state", Boolean.valueOf(state == 0x90 * 256 + 0x00));
 					bleListener.bleAction(map);
+					
+					BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
 				}
 
 				Log.e("---", "FINISH");
@@ -274,13 +305,13 @@ public class BLEClient {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
-
+			
 			if (Constants.ACTION_GATT_CONNECTED.equals(action)) {
 				mConnected = true;
 
 			} else if (Constants.ACTION_GATT_DISCONNECTED.equals(action)) {
 				mConnected = false;
-
+				
 			} else if (Constants.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
 
 			} else if (Constants.ACTION_GATT_DESCRIPTOR_WRITED.equals(action)) {
@@ -295,8 +326,10 @@ public class BLEClient {
 
 	public IntentFilter makeGattUpdateIntentFilter() {
 		final IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(Constants.ACTION_GATT_CONNECTING);
 		intentFilter.addAction(Constants.ACTION_GATT_CONNECTED);
 		intentFilter.addAction(Constants.ACTION_GATT_DISCONNECTED);
+		
 		intentFilter.addAction(Constants.ACTION_GATT_SERVICES_DISCOVERED);
 		intentFilter.addAction(Constants.ACTION_GATT_DESCRIPTOR_WRITED);
 		intentFilter.addAction(Constants.ACTION_DATA_AVAILABLE);

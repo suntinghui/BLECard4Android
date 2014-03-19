@@ -72,7 +72,7 @@ public class BLEUtil {
 		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 			Log.e("===", device.getName()+"---"+device.getAddress());
 			
-			if (device.getName().contains("BLE CARD")) {
+			if (device.getName().contains("LinkSim")) {
 				deviceList.add(device);
 
 				mScanning = false;
@@ -100,7 +100,7 @@ public class BLEUtil {
 	public static BluetoothDevice getMyDevice() {
 		ArrayList<BluetoothDevice> list = getDevices();
 		for (BluetoothDevice device : list) {
-			if (device.getName().contains("BLE CARD")) {
+			if (device.getName().contains("LinkSim")) {
 				return device;
 			}
 		}

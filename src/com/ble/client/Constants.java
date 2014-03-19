@@ -12,9 +12,13 @@ public class Constants {
 	
 	public static String CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb";
 	
+	public final static String ACTION_GATT_CONNECTING 						= "ACTION_GATT_CONNECTING";
 	public final static String ACTION_GATT_CONNECTED 						= "ACTION_GATT_CONNECTED";
 	public final static String ACTION_GATT_DISCONNECTED 					= "ACTION_GATT_DISCONNECTED";
 	public final static String ACTION_GATT_SERVICES_DISCOVERED 				= "ACTION_GATT_SERVICES_DISCOVERED";
 	public final static String ACTION_GATT_DESCRIPTOR_WRITED				= "ACTION_GATT_DESCRIPTOR_WRITED";
 	public final static String ACTION_DATA_AVAILABLE 						= "ACTION_DATA_AVAILABLE";
+	
+	
+	public final static String SECURITY_KEY									= "SECURITY_KEY";
 }

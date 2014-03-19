@@ -1,10 +1,13 @@
 package com.ble.activity;
 
 import com.ble.R;
+import com.ble.client.ApplicationEnvironment;
 import com.ble.client.BLEClient;
+import com.ble.client.Constants;
 import com.ble.util.ByteUtil;
 import com.ble.util.SecurityUtil;
 
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,29 +36,6 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 		this.pwdText.setText("22334455");
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(BLEClient.getInstance().mGattUpdateReceiver, BLEClient.getInstance().makeGattUpdateIntentFilter());
-	}
-
-	protected void onPause() {
-		super.onPause();
-		unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-
-		try {
-			unbindService(BLEClient.getInstance().mServiceConnection);
-			BLEClient.getInstance().mBluetoothLeService = null;
-		} catch (Exception e) {
-
-		}
-	}
-
 	private boolean checkValue() {
 		if (deviceNumText.getText().equals("")) {
 			Toast.makeText(this, "请输入设备账号", Toast.LENGTH_SHORT).show();
@@ -77,6 +57,14 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 			return;
 
 		if (view.getId() == R.id.btn_registration) {
+			String md5Str = SecurityUtil.MD5Crypto(pwdText.getText().toString().trim());
+			Log.e("===", md5Str);
+			
+			Editor editor = ApplicationEnvironment.getInstance().getPreferences().edit();
+			editor.putString(Constants.SECURITY_KEY, md5Str);
+			editor.commit();
+			
+			Toast.makeText(this, "注册成功！", Toast.LENGTH_SHORT).show();;
 		}
 	}
 

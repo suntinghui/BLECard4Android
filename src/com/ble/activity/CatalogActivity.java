@@ -1,5 +1,7 @@
 package com.ble.activity;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ble.R;
+import com.ble.client.ApplicationEnvironment;
 
 public class CatalogActivity extends BaseActivity {
 	
@@ -127,15 +130,29 @@ public class CatalogActivity extends BaseActivity {
 
 	};
 
+
 	// 程序退出
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-			finish();
+			if ((System.currentTimeMillis() - exitTimeMillis) > 2000) {
+				Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+				exitTimeMillis = System.currentTimeMillis();
+			} else {
+				ApplicationEnvironment.getInstance().exitApp();
+				
+				ArrayList<BaseActivity> list = BaseActivity.getAllActiveActivity();
+				for (BaseActivity activity : list) {
+					activity.finish();
+				}
+				
+				System.exit(0);
+			}
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+
 
 	public final class CatalogHolder {
 		public ImageView CatalogCellImage;

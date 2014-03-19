@@ -31,36 +31,12 @@ public class QueryBalanceActivity extends BaseActivity implements OnClickListene
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(BLEClient.getInstance().mGattUpdateReceiver, BLEClient.getInstance().makeGattUpdateIntentFilter());
-	}
-
-	protected void onPause() {
-		super.onPause();
-		unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-
-		try {
-			unbindService(BLEClient.getInstance().mServiceConnection);
-			BLEClient.getInstance().mBluetoothLeService = null;
-		} catch (Exception e) {
-
-		}
-
-	}
-
-	@Override
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_query) {
 			balanceView.setText("");
 
 			byte[] value = new byte[] { (byte) 0x07, (byte) 0x00, (byte) 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10, (byte) 0x01, (byte) 0x05, (byte) 0x80, (byte) 0x5c, (byte) 0x00, (byte) 0x02, (byte) 0x04 };
-			BLEClient.getInstance().sendData(this, this, BLETransferTypeEnum.TRANSFER_QUERYBALANCE, value);
+			BLEClient.getInstance().sendData(this, BLETransferTypeEnum.TRANSFER_QUERYBALANCE, value);
 		}
 	}
 

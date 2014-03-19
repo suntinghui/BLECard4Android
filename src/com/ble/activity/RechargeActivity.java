@@ -37,29 +37,6 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(BLEClient.getInstance().mGattUpdateReceiver, BLEClient.getInstance().makeGattUpdateIntentFilter());
-	}
-
-	protected void onPause() {
-		super.onPause();
-		unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-
-		try {
-			unbindService(BLEClient.getInstance().mServiceConnection);
-			BLEClient.getInstance().mBluetoothLeService = null;
-		} catch (Exception e) {
-
-		}
-	}
-
-	@Override
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_recharge) {
 			if (moneyEdit.getText().length() == 0) {
@@ -91,7 +68,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 			System.arraycopy(rechargeByte, 0, value, value1.length, rechargeByte.length);
 			System.arraycopy(dateByte, 0, value, value1.length + rechargeByte.length, dateByte.length);
 
-			BLEClient.getInstance().sendData(this, this, BLETransferTypeEnum.TRANSFER_RECHARGE, value);
+			BLEClient.getInstance().sendData(this, BLETransferTypeEnum.TRANSFER_RECHARGE, value);
 		}
 	}
 

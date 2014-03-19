@@ -94,7 +94,7 @@ public class ByteUtil {
 		return hs.toUpperCase();
 	}
 
-	public static String byteArr2HexStr(byte[] arrB) throws Exception {
+	public static String byteArr2HexStr(byte[] arrB) {
 		int iLen = arrB.length;
 		// 每个byte用两个字符才能表示，所以字符串的长度是数组长度的两倍
 		StringBuffer sb = new StringBuffer(iLen * 2);

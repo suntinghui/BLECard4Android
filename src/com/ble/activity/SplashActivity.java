@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.ble.R;
+import com.ble.client.ApplicationEnvironment;
 
 public class SplashActivity extends BaseActivity{
 	
@@ -25,6 +26,8 @@ public class SplashActivity extends BaseActivity{
 		@Override
 		protected Object doInBackground(Object... arg0) {
 			try{
+				
+				ApplicationEnvironment.getInstance().getApplication();
 				
 				Thread.sleep(1500);
 				

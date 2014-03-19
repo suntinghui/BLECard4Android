@@ -9,15 +9,17 @@
 
     <application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme" >
         
-        <activity android:name=".activity.CatalogActivity" android:label="@string/app_name" android:screenOrientation="portrait">
+        <activity android:name=".activity.SplashActivity" android:label="@string/app_name" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.CatalogActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.QueryBalanceActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.QueryTransHistoryActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.RechargeActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RegistrationActivity" android:screenOrientation="portrait"/>
         
         <service android:name=".client.BLEService" android:enabled="true"/>
         

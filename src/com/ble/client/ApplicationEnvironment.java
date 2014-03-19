@@ -31,6 +31,7 @@ public class ApplicationEnvironment {
 	public Application getApplication(){
 		if (null == this.application){
 			this.application = BaseActivity.getTopActivity().getApplication();
+			BLEClient.getInstance();
 		}
 		
 		return this.application;
@@ -69,6 +70,13 @@ public class ApplicationEnvironment {
 				.getLaunchIntentForPackage(getApplication().getBaseContext().getPackageName());
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		getApplication().startActivity(intent);
+	}
+	
+	public void exitApp(){
+		this.application.unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
+		
+		this.application.unbindService(BLEClient.getInstance().mServiceConnection);
+		BLEClient.getInstance().mBLEService = null;
 	}
 
 }

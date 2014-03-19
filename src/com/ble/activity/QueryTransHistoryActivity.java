@@ -31,29 +31,6 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 		this.queryHistory();
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(BLEClient.getInstance().mGattUpdateReceiver, BLEClient.getInstance().makeGattUpdateIntentFilter());
-	}
-
-	protected void onPause() {
-		super.onPause();
-		unregisterReceiver(BLEClient.getInstance().mGattUpdateReceiver);
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-
-		try {
-			unbindService(BLEClient.getInstance().mServiceConnection);
-			BLEClient.getInstance().mBluetoothLeService = null;
-		} catch (Exception e) {
-
-		}
-	}
-
 	private void queryHistory() {
 		byte[] tempData = new byte[350];
 		tempData[0] = (byte) 0x07;
@@ -78,7 +55,7 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 		byte[] value = new byte[8 + 10 * 6];
 		System.arraycopy(tempData, 0, value, 0, value.length);
 
-		BLEClient.getInstance().sendData(this, this, BLETransferTypeEnum.TRANSFER_QUERYHISTORY, value);
+		BLEClient.getInstance().sendData(this, BLETransferTypeEnum.TRANSFER_QUERYHISTORY, value);
 	}
 
 	@Override
