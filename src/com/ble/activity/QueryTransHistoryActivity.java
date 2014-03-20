@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -12,11 +16,15 @@ import com.ble.client.BELActionListener;
 import com.ble.client.BLEClient;
 import com.ble.client.BLETransferTypeEnum;
 import com.ble.model.TransferModel;
+import com.ble.util.DateUtil;
 
-public class QueryTransHistoryActivity extends BaseActivity implements BELActionListener {
+public class QueryTransHistoryActivity extends BaseActivity implements BELActionListener, OnClickListener {
 
 	private ListView listView = null;
 	private ArrayList<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
+
+	private Button backBtn = null;
+	private Button queryBtn = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +36,10 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 		SimpleAdapter listItemAdapter = new SimpleAdapter(this, mapList, R.layout.listitem_transfer_history, new String[] { "transNum", "transType", "transAmount", "transTime", "transTerm" }, new int[] { R.id.transNum, R.id.transType, R.id.transAmount, R.id.transTime, R.id.transTerm });
 		listView.setAdapter(listItemAdapter);
 
-		this.queryHistory();
+		backBtn = (Button) this.findViewById(R.id.btn_back);
+		backBtn.setOnClickListener(this);
+		queryBtn = (Button) this.findViewById(R.id.btn_query);
+		queryBtn.setOnClickListener(this);
 	}
 
 	private void queryHistory() {
@@ -60,16 +71,19 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 
 	@Override
 	public void bleAction(Object obj) {
-		@SuppressWarnings("unchecked")
+		mapList.clear();
+		
 		HashMap<String, Object> map = (HashMap<String, Object>) obj;
 		ArrayList<TransferModel> modelList = (ArrayList<TransferModel>) map.get("list");
 
+		Log.e("明细", "历史记录数：" + modelList.size());
+		
 		for (TransferModel model : modelList) {
 			HashMap<String, String> tempMap = new HashMap<String, String>();
 			tempMap.put("transNum", model.getNum() + "");
 			tempMap.put("transType", this.getTransType(model.getType()));
 			tempMap.put("transAmount", this.getAmount(model.getJiaoyi()));
-			tempMap.put("transTime", this.getTime(model));
+			tempMap.put("transTime", DateUtil.formatDateTime(model.getDate()+model.getTime()));
 			tempMap.put("transTerm", model.getZhongduan());
 
 			mapList.add(tempMap);
@@ -78,22 +92,23 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 		((SimpleAdapter) listView.getAdapter()).notifyDataSetChanged();
 	}
 
+	/*
 	public String getTime(TransferModel model) {
-		int date = model.getDate();
-		int time = model.getTime();
+		long date = model.getDate();
+		long time = model.getTime();
 
-		int year = date / (256 * 256);
+		long year = date / (256 * 256);
 		year = year / (256 * 16) * 1000 + (year % (256 * 16)) / (256) * 100 + (year % 256) / 16 * 10 + (year % 16);
-		int month = date % (256 * 256) / 256;
+		long month = date % (256 * 256) / 256;
 		month = month / 16 * 10 + month % 16;
-		int day = date % 256;
+		long day = date % 256;
 		day = day / 16 * 10 + day % 16;
 
-		int hour = time / (256 * 256);
+		long hour = time / (256 * 256);
 		hour = hour / 16 * 10 + hour % 16;
-		int min = time % (256 * 256) / 256;
+		long min = time % (256 * 256) / 256;
 		min = min / 16 * 10 + min % 16;
-		int second = time % 256;
+		long second = time % 256;
 		second = second / 16 * 10 + second % 16;
 
 		StringBuffer sb = new StringBuffer();
@@ -102,6 +117,7 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 
 		return sb.toString();
 	}
+	*/
 
 	public String getAmount(int amount) {
 		String val1 = String.format("%,d", amount / 100);
@@ -140,6 +156,15 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 		}
 
 		return typeStr;
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (view.getId() == R.id.btn_back) {
+			this.finish();
+		} else if (view.getId() == R.id.btn_query) {
+			this.queryHistory();
+		}
 	}
 
 }

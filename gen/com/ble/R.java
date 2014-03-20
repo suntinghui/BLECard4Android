@@ -21,65 +21,79 @@ public final class R {
         public static final int white=0x7f040001;
     }
     public static final class drawable {
-        public static final int bg_bombbox=0x7f020000;
-        public static final int btn_cancel=0x7f020001;
-        public static final int btn_cancel_pressed=0x7f020002;
-        public static final int btn_cancel_selector=0x7f020003;
-        public static final int btn_ok_normal=0x7f020004;
-        public static final int btn_ok_pressed=0x7f020005;
-        public static final int btn_ok_selector=0x7f020006;
-        public static final int catalog_1_button=0x7f020007;
-        public static final int catalog_2_button=0x7f020008;
-        public static final int catalog_3_button=0x7f020009;
-        public static final int catalog_4_button=0x7f02000a;
-        public static final int catalog_5_button=0x7f02000b;
-        public static final int catalog_6_button=0x7f02000c;
-        public static final int catalog_bg=0x7f02000d;
-        public static final int catalog_n_1=0x7f02000e;
-        public static final int catalog_n_2=0x7f02000f;
-        public static final int catalog_n_3=0x7f020010;
-        public static final int catalog_n_4=0x7f020011;
-        public static final int catalog_n_5=0x7f020012;
-        public static final int catalog_n_6=0x7f020013;
-        public static final int catalog_s_1=0x7f020014;
-        public static final int catalog_s_2=0x7f020015;
-        public static final int catalog_s_3=0x7f020016;
-        public static final int catalog_s_4=0x7f020017;
-        public static final int catalog_s_5=0x7f020018;
-        public static final int catalog_s_6=0x7f020019;
-        public static final int dialog_bottom_bg=0x7f02001a;
-        public static final int ic_launcher=0x7f02001b;
-        public static final int listdivider=0x7f02001c;
-        public static final int progressbar_circle=0x7f02001d;
-        public static final int splash=0x7f02001e;
-        public static final int topbg=0x7f02001f;
+        public static final int backdrop=0x7f020000;
+        public static final int bg=0x7f020001;
+        public static final int bg_bombbox=0x7f020002;
+        public static final int bg_input=0x7f020003;
+        public static final int btn_back=0x7f020004;
+        public static final int btn_back_nor=0x7f020005;
+        public static final int btn_back_sel=0x7f020006;
+        public static final int btn_cancel=0x7f020007;
+        public static final int btn_cancel_pressed=0x7f020008;
+        public static final int btn_cancel_selector=0x7f020009;
+        public static final int btn_else=0x7f02000a;
+        public static final int btn_else_nor=0x7f02000b;
+        public static final int btn_else_sel=0x7f02000c;
+        public static final int btn_exit=0x7f02000d;
+        public static final int btn_exit_nor=0x7f02000e;
+        public static final int btn_exit_sel=0x7f02000f;
+        public static final int btn_login=0x7f020010;
+        public static final int btn_login_n=0x7f020011;
+        public static final int btn_login_s=0x7f020012;
+        public static final int btn_message=0x7f020013;
+        public static final int btn_message_nor=0x7f020014;
+        public static final int btn_message_sel=0x7f020015;
+        public static final int btn_ok_normal=0x7f020016;
+        public static final int btn_ok_pressed=0x7f020017;
+        public static final int btn_ok_selector=0x7f020018;
+        public static final int btn_payment=0x7f020019;
+        public static final int btn_payment_nor=0x7f02001a;
+        public static final int btn_payment_sel=0x7f02001b;
+        public static final int btn_reimburse=0x7f02001c;
+        public static final int btn_reimburse_nor=0x7f02001d;
+        public static final int btn_reimburse_sel=0x7f02001e;
+        public static final int btn_set=0x7f02001f;
+        public static final int btn_set_nor=0x7f020020;
+        public static final int btn_set_sel=0x7f020021;
+        public static final int btn_travel=0x7f020022;
+        public static final int btn_travel_nor=0x7f020023;
+        public static final int btn_travel_sel=0x7f020024;
+        public static final int btn_user=0x7f020025;
+        public static final int catalog_bg=0x7f020026;
+        public static final int dialog_bottom_bg=0x7f020027;
+        public static final int ic_launcher=0x7f020028;
+        public static final int listdivider=0x7f020029;
+        public static final int logo=0x7f02002a;
+        public static final int progressbar_circle=0x7f02002b;
+        public static final int splash=0x7f02002c;
+        public static final int topbg=0x7f02002d;
     }
     public static final class id {
-        public static final int badgeImageView=0x7f07000c;
-        public static final int badgeNumText=0x7f07000d;
+        public static final int badgeImageView=0x7f07000d;
+        public static final int badgeNumText=0x7f07000e;
         public static final int bottomLayout=0x7f070018;
-        public static final int btn_query=0x7f070003;
-        public static final int btn_recharge=0x7f070006;
-        public static final int btn_registration=0x7f070009;
-        public static final int catalogCellImage=0x7f07000b;
-        public static final int catalogTitleText=0x7f07000e;
-        public static final int et_deviceNum=0x7f070007;
-        public static final int et_money=0x7f070005;
-        public static final int et_pwd=0x7f070008;
-        public static final int gridveiw=0x7f070001;
-        public static final int layout_balance=0x7f070004;
+        public static final int btn_back=0x7f070001;
+        public static final int btn_query=0x7f070004;
+        public static final int btn_recharge=0x7f070007;
+        public static final int btn_registration=0x7f07000a;
+        public static final int catalogCellImage=0x7f07000c;
+        public static final int et_deviceNum=0x7f070008;
+        public static final int et_money=0x7f070006;
+        public static final int et_pwd=0x7f070009;
+        public static final int gridveiw=0x7f070002;
+        public static final int layout_balance=0x7f070005;
         public static final int message=0x7f070015;
         public static final int negativeButton=0x7f070017;
         public static final int positiveButton=0x7f070016;
         public static final int title=0x7f070014;
         public static final int topbarLayout=0x7f070000;
         public static final int transAmount=0x7f070011;
-        public static final int transList=0x7f07000a;
+        public static final int transList=0x7f07000b;
         public static final int transNum=0x7f07000f;
         public static final int transTerm=0x7f070013;
         public static final int transTime=0x7f070012;
         public static final int transType=0x7f070010;
-        public static final int tv_balance=0x7f070002;
+        public static final int tv_balance=0x7f070003;
     }
     public static final class layout {
         public static final int activity_catalog=0x7f030000;
@@ -88,7 +102,7 @@ public final class R {
         public static final int activity_registration=0x7f030003;
         public static final int activity_splash=0x7f030004;
         public static final int activity_transfer_history=0x7f030005;
-        public static final int listitem_catalog=0x7f030006;
+        public static final int item_catalog=0x7f030006;
         public static final int listitem_transfer_history=0x7f030007;
         public static final int view_alert_dialog=0x7f030008;
         public static final int view_progress_dialog=0x7f030009;
@@ -97,7 +111,7 @@ public final class R {
         public static final int app_name=0x7f050000;
     }
     public static final class style {
-        public static final int Animation=0x7f060015;
+        public static final int Animation=0x7f060016;
         /** 
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
@@ -125,7 +139,7 @@ public final class R {
          */
         public static final int AppTheme=0x7f060001;
         public static final int Dialog=0x7f060008;
-        public static final int ProgressHUD=0x7f060016;
+        public static final int ProgressHUD=0x7f060017;
         public static final int TextView13_blue=0x7f060009;
         public static final int TextView14_white=0x7f06000b;
         public static final int TextView14sp_black=0x7f06000a;
@@ -139,12 +153,13 @@ public final class R {
         public static final int TextView20sp=0x7f060011;
         /**  取消动画 
          */
-        public static final int Theme=0x7f060014;
+        public static final int Theme=0x7f060015;
         public static final int sdw_79351b=0x7f060005;
         public static final int sdw_white=0x7f060004;
         public static final int text_15_666666_sdw=0x7f060007;
         public static final int text_15_ffffff_sdw=0x7f060006;
         public static final int text_16_666666=0x7f060003;
         public static final int text_18_ffffff=0x7f060002;
+        public static final int white_20=0x7f060014;
     }
 }

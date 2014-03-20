@@ -7,8 +7,8 @@ public class TransferModel {
 	public int jiaoyi;
 	public int type;
 	public String zhongduan;
-	public int date;
-	public int time;
+	public String date;
+	public String time;
 
 	public int getNum() {
 		return num;
@@ -50,19 +50,19 @@ public class TransferModel {
 		this.zhongduan = zhongduan;
 	}
 
-	public int getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(int date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 
-	public int getTime() {
+	public String getTime() {
 		return time;
 	}
 
-	public void setTime(int time) {
+	public void setTime(String time) {
 		this.time = time;
 	}
 

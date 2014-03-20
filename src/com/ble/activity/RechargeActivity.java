@@ -23,6 +23,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 	private TextView balanceView = null;
 	private EditText moneyEdit = null;
 	private Button queryBtn = null;
+	private Button backBtn = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,18 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 		moneyEdit = (EditText) this.findViewById(R.id.et_money);
 		queryBtn = (Button) this.findViewById(R.id.btn_recharge);
 		queryBtn.setOnClickListener(this);
+		backBtn = (Button) this.findViewById(R.id.btn_back);
+		backBtn.setOnClickListener(this);
 
 		balanceView.setText("");
 	}
 
 	@Override
 	public void onClick(View view) {
-		if (view.getId() == R.id.btn_recharge) {
+		if (view.getId() == R.id.btn_back) {
+			this.finish();
+
+		} else if (view.getId() == R.id.btn_recharge) {
 			if (moneyEdit.getText().length() == 0) {
 				Toast.makeText(RechargeActivity.this, "请输入金额", Toast.LENGTH_SHORT).show();
 				return;
@@ -88,7 +94,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 				String val2 = String.format("%2d", money % 100);
 
 				balanceLayout.setVisibility(View.VISIBLE);
-				balanceView.setText(val1 + "." + val2 + " 元");
+				balanceView.setText(val1 + "." + val2);
 			} else {
 				balanceLayout.setVisibility(View.VISIBLE);
 				balanceView.setText("查询余额失败");
@@ -98,6 +104,8 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 			boolean state = (Boolean) map.get("state");
 			if (state) {
 				Toast.makeText(this, "充值成功！", Toast.LENGTH_SHORT).show();
+
+				this.moneyEdit.setText("");
 
 			} else {
 				Toast.makeText(this, "充值失败！", Toast.LENGTH_SHORT).show();

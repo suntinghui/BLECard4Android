@@ -3,67 +3,106 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <RelativeLayout
+        android:id="@+id/topbarLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_login_n"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/btn_back" />
+
+        <TextView
+            style="@style/white_20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="账户充值" />
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
         android:paddingLeft="30dip"
-        android:paddingRight="30dip"
-         >
+        android:paddingRight="30dip" >
 
         <LinearLayout
             android:id="@+id/layout_balance"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal"
             android:visibility="invisible" >
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center"
-                android:text="余       额：" 
-                />
+                android:layout_height="wrap_content"
+                android:text="余额：  "
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tv_balance"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingLeft="30dip"
-                android:text="100" />
+                android:layout_height="wrap_content"
+                android:text="111"
+                android:textColor="#ff945c"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  元"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
-            android:orientation="horizontal" >
+            android:layout_height="44dip"
+            android:layout_marginLeft="25dip"
+            android:layout_marginRight="25dip"
+            android:layout_marginTop="50dip" >
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center"
-                android:text="充值金额：" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dip"
+                android:src="@drawable/btn_user" />
 
             <EditText
                 android:id="@+id/et_money"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingLeft="30dip"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dip"
+                android:background="@null"
+                android:hint="请输入充值金额"
                 android:inputType="number"
                 android:maxLength="4" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_recharge"
+        <ImageView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dip"
+            android:layout_marginLeft="25dip"
+            android:layout_marginRight="25dip"
+            android:src="@drawable/bg_input" />
+
+        <Button
+            android:id="@+id/btn_recharge"
+            style="@style/white_20"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dip"
+            android:background="@drawable/btn_exit"
             android:text="充  值" />
     </LinearLayout>
 
