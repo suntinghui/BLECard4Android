@@ -37,7 +37,6 @@ public class SplashActivity extends BaseActivity{
 				e.printStackTrace();
 				return null;
 			}
-			
 		}
 
 		@Override
