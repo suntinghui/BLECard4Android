@@ -82,13 +82,14 @@ public class BLEClient {
 			try {
 				Looper.prepare();
 				mBLEService.connect();
+				
 			} catch(Exception e){
 				e.printStackTrace();
+				Looper.loop();
 			}
-			
 			return null;
 		}
-		
+
 	}
 
 	public ServiceConnection mServiceConnection = new ServiceConnection() {
