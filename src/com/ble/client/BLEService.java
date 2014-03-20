@@ -56,7 +56,7 @@ public class BLEService extends Service {
 	public boolean connect() {
 		Log.e(TAG, "开始尝试连接设备...");
 		
-		this.disconnect();
+		//this.disconnect();
 		
 		Log.e(TAG, "××××××××××××××××××××××××××××××");
 		
@@ -85,6 +85,7 @@ public class BLEService extends Service {
 			return;
 		}
 
+//		mBluetoothGatt.disconnect();
 		mBluetoothGatt.close();
 		mBluetoothGatt = null;
 	}

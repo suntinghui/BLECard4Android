@@ -51,14 +51,18 @@ public class BLEClient {
 	}
 
 	public BLEClient() {
-		Intent gattServiceIntent = new Intent(ApplicationEnvironment.getInstance().getApplication(), BLEService.class);
-		ApplicationEnvironment.getInstance().getApplication().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-		
 		ApplicationEnvironment.getInstance().getApplication().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 	}
 
 	// 只负责初始化组织数据
 	public void sendData(BELActionListener listener, BLETransferTypeEnum type, byte[] value) {
+		BaseActivity.getTopActivity().showDialog(BaseActivity.PROGRESS_DIALOG, "正在处理请稍候");
+		
+		if (mBLEService != null){
+			ApplicationEnvironment.getInstance().getApplication().unbindService(BLEClient.getInstance().mServiceConnection);
+			BLEClient.getInstance().mBLEService = null;
+		}
+		
 		Log.e(TAG, "================================================");
 		Log.e(TAG, "sendData........");
 
@@ -66,37 +70,17 @@ public class BLEClient {
 		bleListener = listener;
 		byteValue = value;
 		
-		new BLETask().execute();
+		Intent gattServiceIntent = new Intent(ApplicationEnvironment.getInstance().getApplication(), BLEService.class);
+		ApplicationEnvironment.getInstance().getApplication().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 	
-	class BLETask extends AsyncTask<Object, Object, Object> {
-		
-		@Override
-		protected void onPreExecute() {
-			BaseActivity.getTopActivity().showDialog(BaseActivity.PROGRESS_DIALOG, "正在操作请稍候");
-			super.onPreExecute();
-		}
-
-		@Override
-		protected Object doInBackground(Object... arg0) {
-			try {
-				Looper.prepare();
-				mBLEService.connect();
-				
-			} catch(Exception e){
-				e.printStackTrace();
-				Looper.loop();
-			}
-			return null;
-		}
-
-	}
-
 	public ServiceConnection mServiceConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
 			mBLEService = ((BLEService.LocalBinder) service).getService();
+			
+			mBLEService.connect();
 		}
 
 		@Override
@@ -145,8 +129,9 @@ public class BLEClient {
 		byteList.clear();
 		byteList.add(disValue);
 		nowDataSign = 0;
-
+		
 		this.sendPack();
+		
 	}
 
 	private void formatSendByte() {
@@ -286,6 +271,11 @@ public class BLEClient {
 					map.put("type", currentType.getId());
 					map.put("state", Boolean.valueOf(state == 0x90 * 256 + 0x00));
 					bleListener.bleAction(map);
+					
+					byteValue = new byte[] { (byte) 0x07, (byte) 0x00, (byte) 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10, (byte) 0x01, (byte) 0x05, (byte) 0x80, (byte) 0x5c, (byte) 0x00, (byte) 0x02, (byte) 0x04 };
+					currentType = BLETransferTypeEnum.TRANSFER_QUERYBALANCE;
+					this.byteList.clear();
+					this.sendPack();
 					
 					BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
 				}

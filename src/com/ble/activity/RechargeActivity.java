@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.ble.util.DateUtil;
 
 public class RechargeActivity extends BaseActivity implements OnClickListener, BELActionListener {
 
+	private LinearLayout balanceLayout = null;
 	private TextView balanceView = null;
 	private EditText moneyEdit = null;
 	private Button queryBtn = null;
@@ -28,6 +30,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 
 		setContentView(R.layout.activity_recharge);
 
+		balanceLayout = (LinearLayout) this.findViewById(R.id.layout_balance);
 		balanceView = (TextView) this.findViewById(R.id.tv_balance);
 		moneyEdit = (EditText) this.findViewById(R.id.et_money);
 		queryBtn = (Button) this.findViewById(R.id.btn_recharge);
@@ -76,6 +79,7 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 	public void bleAction(Object obj) {
 		HashMap<String, Object> map = (HashMap<String, Object>) obj;
 		int id = (Integer) map.get("type");
+
 		if (id == BLETransferTypeEnum.TRANSFER_QUERYBALANCE.getId()) {
 			int money = (Integer) map.get("money");
 			boolean state = (Boolean) map.get("state");
@@ -83,7 +87,11 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 				String val1 = String.format("%,d", money / 100);
 				String val2 = String.format("%2d", money % 100);
 
+				balanceLayout.setVisibility(View.VISIBLE);
 				balanceView.setText(val1 + "." + val2 + " 元");
+			} else {
+				balanceLayout.setVisibility(View.VISIBLE);
+				balanceView.setText("查询余额失败");
 			}
 
 		} else if (id == BLETransferTypeEnum.TRANSFER_RECHARGE.getId()) {
@@ -91,12 +99,6 @@ public class RechargeActivity extends BaseActivity implements OnClickListener, B
 			if (state) {
 				Toast.makeText(this, "充值成功！", Toast.LENGTH_SHORT).show();
 
-				// byte[] value = new byte[] { (byte) 0x07, (byte) 0x00, (byte)
-				// 0xa4, (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x10,
-				// (byte) 0x01, (byte) 0x05, (byte) 0x80, (byte) 0x5c, (byte)
-				// 0x00, (byte) 0x02, (byte) 0x04 };
-				// BLEClient.getInstance().sendData(this, this,
-				// BLETransferTypeEnum.TRANSFER_QUERYBALANCE, value);
 			} else {
 				Toast.makeText(this, "充值失败！", Toast.LENGTH_SHORT).show();
 			}

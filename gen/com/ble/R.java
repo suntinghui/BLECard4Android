@@ -55,29 +55,30 @@ public final class R {
         public static final int topbg=0x7f02001f;
     }
     public static final class id {
-        public static final int badgeImageView=0x7f07000b;
-        public static final int badgeNumText=0x7f07000c;
-        public static final int bottomLayout=0x7f070017;
+        public static final int badgeImageView=0x7f07000c;
+        public static final int badgeNumText=0x7f07000d;
+        public static final int bottomLayout=0x7f070018;
         public static final int btn_query=0x7f070003;
-        public static final int btn_recharge=0x7f070005;
-        public static final int btn_registration=0x7f070008;
-        public static final int catalogCellImage=0x7f07000a;
-        public static final int catalogTitleText=0x7f07000d;
-        public static final int et_deviceNum=0x7f070006;
-        public static final int et_money=0x7f070004;
-        public static final int et_pwd=0x7f070007;
+        public static final int btn_recharge=0x7f070006;
+        public static final int btn_registration=0x7f070009;
+        public static final int catalogCellImage=0x7f07000b;
+        public static final int catalogTitleText=0x7f07000e;
+        public static final int et_deviceNum=0x7f070007;
+        public static final int et_money=0x7f070005;
+        public static final int et_pwd=0x7f070008;
         public static final int gridveiw=0x7f070001;
-        public static final int message=0x7f070014;
-        public static final int negativeButton=0x7f070016;
-        public static final int positiveButton=0x7f070015;
-        public static final int title=0x7f070013;
+        public static final int layout_balance=0x7f070004;
+        public static final int message=0x7f070015;
+        public static final int negativeButton=0x7f070017;
+        public static final int positiveButton=0x7f070016;
+        public static final int title=0x7f070014;
         public static final int topbarLayout=0x7f070000;
-        public static final int transAmount=0x7f070010;
-        public static final int transList=0x7f070009;
-        public static final int transNum=0x7f07000e;
-        public static final int transTerm=0x7f070012;
-        public static final int transTime=0x7f070011;
-        public static final int transType=0x7f07000f;
+        public static final int transAmount=0x7f070011;
+        public static final int transList=0x7f07000a;
+        public static final int transNum=0x7f07000f;
+        public static final int transTerm=0x7f070013;
+        public static final int transTime=0x7f070012;
+        public static final int transType=0x7f070010;
         public static final int tv_balance=0x7f070002;
     }
     public static final class layout {
