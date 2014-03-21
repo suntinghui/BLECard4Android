@@ -2,10 +2,13 @@ package com.ble.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import android.util.Log;
 
 public class SecurityUtil {
 
@@ -84,16 +87,32 @@ public class SecurityUtil {
 	}
 
 	public static String xorHex(String input, String key) {
-		StringBuffer sb = new StringBuffer(input);
-		while (sb.length() % 16 != 0) {
-			sb.append("00");
+		try {
+			StringBuffer sb = new StringBuffer(input);
+			while (sb.length() % key.length() != 0) {
+				sb.append("00");
+			}
+			
+			StringBuffer result = new StringBuffer();
+			
+			while (sb.length() != 0){
+				char[] chars = new char[key.length()];
+				for (int j = 0; j < chars.length; j++) {
+					chars[j] = toHex(fromHex(sb.charAt(j)) ^ fromHex(key.charAt(j)));
+				}
+				
+				sb.delete(0, key.length());
+				
+				result.append(new String(chars));
+			}
+			
+			return result.toString();
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			
+			return null;
 		}
-
-		char[] chars = new char[sb.length()];
-		for (int i = 0; i < chars.length; i++) {
-			chars[i] = toHex(fromHex(sb.charAt(i)) ^ fromHex(key.charAt(i)));
-		}
-		return new String(chars);
 	}
 
 	private static int fromHex(char c) {

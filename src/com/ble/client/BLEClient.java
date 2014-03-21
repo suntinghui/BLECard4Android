@@ -3,20 +3,19 @@ package com.ble.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.ble.activity.BaseActivity;
-import com.ble.model.TransferModel;
-import com.ble.util.ByteUtil;
-
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
+
+import com.ble.activity.BaseActivity;
+import com.ble.model.TransferModel;
+import com.ble.util.ByteUtil;
+import com.ble.util.SecurityUtil;
 
 public class BLEClient {
 
@@ -41,6 +40,15 @@ public class BLEClient {
 	private int revPt = 0;
 
 	private boolean mConnected = false;
+	
+	private int mAuthState = STATE_AUTO_NO;
+	private final static int STATE_AUTO_NO = 0;
+	private final static int STATE_AUTO_IN = 1;
+	private final static int STATE_AUTO_OUT = 2;
+	private final static int STATE_AUTO_DONE = 3;
+	
+	private BLETransferTypeEnum currentTypeTemp;
+	private String XORKey = null;
 
 	public static BLEClient getInstance() {
 		if (null == instance) {
@@ -65,7 +73,8 @@ public class BLEClient {
 		
 		Log.e(TAG, "================================================");
 		Log.e(TAG, "sendData........");
-
+		
+		mAuthState = STATE_AUTO_NO;
 		currentType = type;
 		bleListener = listener;
 		byteValue = value;
@@ -94,9 +103,15 @@ public class BLEClient {
 		if (!mConnected) {
 			return;
 		}
+		
+		if (mAuthState == STATE_AUTO_NO) {
+			currentTypeTemp = currentType;
+			
+			doAuthIn();
+		}
 
 		if (byteList.isEmpty()) {
-			this.formatSendByte();
+			byteList = this.formatSendByte(byteValue);
 		}
 
 		// TODO
@@ -112,10 +127,46 @@ public class BLEClient {
 			nowSendState = 1;
 
 			mBLEService.writeCharacteristic(tempValue);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	// 做内部认证
+	private void doAuthIn(){
+		Log.e("AUTH", "发起内部认证");
+		
+		mAuthState = STATE_AUTO_IN;
+		
+		currentType = BLETransferTypeEnum.TRANSFER_AUTH_INNER;
+		
+		byte[] inValue = new byte[] { (byte) 0x10, (byte) 0x01, (byte) 0x00, (byte) 0x02, (byte) 0x84, (byte) 0x18 };
+
+		byteList.clear();
+		byteList.add(inValue);
+		nowDataSign = 0;
+		
+		this.sendPack();
+	}
+	
+	// 做外部认证
+	private void doAuthOut(String hexStr){
+		Log.e("AUTH", "发起外部认证");
+		
+		mAuthState = STATE_AUTO_OUT;
+		
+		currentType = BLETransferTypeEnum.TRANSFER_AUTH_OUTER;
+		
+		byte[] outValue1 = new byte[] {(byte) 0x85, (byte) 0x08 };
+		byte[] outValue2 = ByteUtil.hexStringToBytes(hexStr);
+		byte[] outValue = ByteUtil.cancat(outValue1, outValue2);
+		
+		byteList = this.formatSendByte(outValue);
+		
+		this.sendPack();
+	}
+	
 
 	private void sendRevRequest() {
 		mBLEService.writeCharacteristic(new byte[] { temp });
@@ -131,13 +182,22 @@ public class BLEClient {
 		nowDataSign = 0;
 		
 		this.sendPack();
-		
 	}
 
-	private void formatSendByte() {
-		Log.e("---", "<" + ByteUtil.bytesToHexString(byteValue) + ">");
+	private ArrayList<byte[]> formatSendByte(byte[] tempByte) {
+		Log.e("---", "<" + ByteUtil.bytesToHexString(tempByte) + ">");
+		
+		// 需要做XOR加密
+		if (currentType.getType() == (byte)0x04) {
+			String str = SecurityUtil.xorHex(ByteUtil.byteArr2HexStr(tempByte), XORKey);
+			tempByte = ByteUtil.hexStringToBytes(str);
+			
+			Log.e("---XOR:", "<" + str + ">");
+		}
+		
+		ArrayList<byte[]> tempList = new ArrayList<byte[]>();
 
-		int length = byteValue.length;
+		int length = tempByte.length;
 		for (int start = 0; start < length;) {
 			byte[] tempData = new byte[20];
 			tempData[0] = (byte) (((length + (19 - 16 - 1)) / 19 + 1) * 16 + ((start + (19 - 16)) / 19));
@@ -149,24 +209,26 @@ public class BLEClient {
 
 				int j = 0;
 				for (; start < length && j + 4 < 20; start++, j++) {
-					tempData[j + 4] = byteValue[start];
+					tempData[j + 4] = tempByte[start];
 				}
 				dataLength = j + 4;
 			} else {
 				int j = 0;
 				for (; start < length && j + 1 < 20; start++, j++) {
-					tempData[j + 1] = byteValue[start];
+					tempData[j + 1] = tempByte[start];
 				}
 				dataLength = j + 1;
 			}
 
-			byte[] tempByte = new byte[dataLength];
-			System.arraycopy(tempData, 0, tempByte, 0, dataLength);
+			byte[] temp = new byte[dataLength];
+			System.arraycopy(tempData, 0, temp, 0, dataLength);
 
-			Log.e("TEMP SEND", "---" + ByteUtil.bytesToHexString(tempByte) + "---");
+			Log.e("TEMP SEND", "---" + ByteUtil.bytesToHexString(temp) + "---");
 
-			byteList.add(tempByte);
+			tempList.add(temp);
 		}
+		
+		return tempList;
 	}
 
 	public void parse(byte[] respByte) {
@@ -194,6 +256,8 @@ public class BLEClient {
 					}
 
 					revLength = respByte[2] * 256 + respByte[3];
+					
+					revData = new byte[revLength];
 
 					int i = 4;
 					for (; i < 20 && i < length; i++) {
@@ -215,8 +279,72 @@ public class BLEClient {
 
 				if (temp < ((revLength + (19 - 16 - 1)) / 19 + 1)) {
 					this.sendRevRequest();
+					
 				} else {
-					if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYBALANCE.getId()) {
+					// 需要做XOR加密
+					if (currentType.getType() == (byte)0x04) {
+						String str = SecurityUtil.xorHex(ByteUtil.byteArr2HexStr(revData), XORKey);
+						revData = ByteUtil.hexStringToBytes(str);
+					}
+					
+					if (currentType.getId() == BLETransferTypeEnum.TRANSFER_AUTH_INNER.getId()) { // 内部认证
+						String revString = ByteUtil.byteArr2HexStr(revData).substring(4, 52);
+						Log.e("AUTH", revString);
+						
+						String random1 = revString.substring(0, 16);
+						String value1 = revString.substring(16, 32);
+						String random2 = revString.substring(32, 48);
+						
+						String key = ApplicationEnvironment.getInstance().getPreferences().getString(Constants.SECURITY_KEY, "");
+						String desValue1 = ByteUtil.byteArr2HexStr(SecurityUtil.TripleDESEncry(ByteUtil.hexStringToBytes(key), ByteUtil.hexStringToBytes(random1)));
+						
+						if (value1.equalsIgnoreCase(desValue1)){
+							Log.e("AUTH", "内部认证成功...");
+							
+							byte[] desByte2 = SecurityUtil.TripleDESEncry(ByteUtil.hexStringToBytes(key), ByteUtil.hexStringToBytes(random2));
+							String desValue2 = ByteUtil.byteArr2HexStr(desByte2);
+							String desValue3 = ByteUtil.byteArr2HexStr(SecurityUtil.TripleDESEncry(ByteUtil.hexStringToBytes(key), desByte2));
+							
+							XORKey = desValue3;
+							
+							this.doAuthOut(desValue2+desValue3);
+							
+							return;
+							
+						} else {
+							BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "内部认证失败，请重试");
+							mAuthState = STATE_AUTO_NO;
+						}
+						
+					} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_AUTH_OUTER.getId()) { // 外部认证
+						String revString = ByteUtil.byteArr2HexStr(revData).substring(4,6);
+						Log.e("AUTH", revString);
+						
+						if (revString.equalsIgnoreCase("90")){
+							Log.e("AUTH", "外部认证成功...");
+							
+							mAuthState = STATE_AUTO_DONE;
+							
+							/*
+							String xorValue = SecurityUtil.xorHex(ByteUtil.byteArr2HexStr(byteValue), XORKey);
+							byte[] xorByte = ByteUtil.hexStringToBytes(xorValue);
+							
+							byteValue = xorByte;
+							*/
+							
+							currentType = currentTypeTemp;
+							byteList.clear();
+							
+							this.sendPack();
+							
+							return;
+							
+						} else {
+							BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "外部认证失败，请重试");
+							mAuthState = STATE_AUTO_NO;
+						}
+						
+					} else if (currentType.getId() == BLETransferTypeEnum.TRANSFER_QUERYBALANCE.getId()) {
 						int money = (revData[5] & 0xFF) * 256 * 256 + (revData[6] & 0xFF) * 256 + (revData[7] & 0xFF);
 						Log.e("money", money + "");
 						int state = (revData[8] & 0xFF) * 256 + (revData[9] & 0xFF);
@@ -239,7 +367,7 @@ public class BLEClient {
 						int start = 3;
 						for (; start < revLength;) {
 							int curLength = revData[start] & 0xFF; // 25
-							Log.e("***", "curLength:"+curLength);
+							//Log.e("***", "curLength:"+curLength);
 							
 							if (curLength == 0x19) {
 								TransferModel model = new TransferModel();
@@ -259,7 +387,7 @@ public class BLEClient {
 
 								start += curLength + 1;
 								
-								Log.e("***", "start:"+start); // 29 55 
+								//Log.e("***", "start:"+start); // 29 55 
 							} else {
 								break;
 							}
@@ -290,6 +418,7 @@ public class BLEClient {
 						BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
 					}
 
+					/*
 					Log.e("---", "FINISH");
 					
 					revPt = 0;
@@ -298,6 +427,7 @@ public class BLEClient {
 
 					// 断开链接
 					sendDisConnRequest();
+					*/
 				}
 			}
 		}catch(Exception e){

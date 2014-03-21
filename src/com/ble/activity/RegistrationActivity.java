@@ -1,12 +1,6 @@
 package com.ble.activity;
 
-import com.ble.R;
-import com.ble.client.ApplicationEnvironment;
-import com.ble.client.BLEClient;
-import com.ble.client.Constants;
-import com.ble.util.ByteUtil;
-import com.ble.util.SecurityUtil;
-
+import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,11 +10,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ble.R;
+import com.ble.client.ApplicationEnvironment;
+import com.ble.client.Constants;
+import com.ble.util.SecurityUtil;
+import com.ble.view.LKAlertDialog;
+
 public class RegistrationActivity extends BaseActivity implements OnClickListener {
 
 	private EditText deviceNumText = null;
 	private EditText pwdText = null;
 	private Button regiButton = null;
+	private Button backButton = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,9 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 		this.pwdText = (EditText) this.findViewById(R.id.et_pwd);
 		this.regiButton = (Button) this.findViewById(R.id.btn_registration);
 		this.regiButton.setOnClickListener(this);
-		
+		this.backButton = (Button) this.findViewById(R.id.btn_back);
+		this.backButton.setOnClickListener(this);
+
 		this.pwdText.setText("22334455");
 	}
 
@@ -53,19 +56,22 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 
 	@Override
 	public void onClick(View view) {
-		if (!checkValue())
-			return;
+		if (view.getId() == R.id.btn_back) {
+			this.finish();
 
-		if (view.getId() == R.id.btn_registration) {
+		} else if (view.getId() == R.id.btn_registration) {
+			if (!checkValue())
+				return;
+
 			String md5Str = SecurityUtil.MD5Crypto(pwdText.getText().toString().trim());
 			Log.e("===", md5Str);
-			
+
 			Editor editor = ApplicationEnvironment.getInstance().getPreferences().edit();
 			editor.putString(Constants.SECURITY_KEY, md5Str);
 			editor.commit();
-			
-			Toast.makeText(this, "注册成功！", Toast.LENGTH_SHORT).show();;
+
+			BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "注册成功，密钥已生成。");
 		}
 	}
-
+	
 }

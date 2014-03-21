@@ -138,16 +138,13 @@ public class CatalogActivity extends BaseActivity {
 
 			case 3:
 			case 4:
-			case 5:
 				Toast.makeText(CatalogActivity.this, "暂未实现此功能", Toast.LENGTH_SHORT).show();
 				break;
 
-				/*
 			case 5:
 				Intent intent5 = new Intent(CatalogActivity.this, RegistrationActivity.class);
 				startActivity(intent5);
 				break;
-				*/
 			}
 		}
 

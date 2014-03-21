@@ -21,4 +21,6 @@ public class Constants {
 	
 	
 	public final static String SECURITY_KEY									= "SECURITY_KEY";
+	public final static String DEVICENAME_PRE								= "BLE CARD";
+	
 }
