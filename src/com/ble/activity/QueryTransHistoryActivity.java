@@ -162,8 +162,13 @@ public class QueryTransHistoryActivity extends BaseActivity implements BELAction
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_back) {
 			this.finish();
+			
 		} else if (view.getId() == R.id.btn_query) {
+			mapList.clear();
+			((SimpleAdapter) listView.getAdapter()).notifyDataSetChanged();
+			
 			this.queryHistory();
+			
 		}
 	}
 
