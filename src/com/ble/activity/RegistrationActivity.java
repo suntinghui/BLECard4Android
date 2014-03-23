@@ -1,8 +1,13 @@
 package com.ble.activity;
 
-import android.content.DialogInterface;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,9 +17,9 @@ import android.widget.Toast;
 
 import com.ble.R;
 import com.ble.client.ApplicationEnvironment;
+import com.ble.client.BLEUtil;
 import com.ble.client.Constants;
 import com.ble.util.SecurityUtil;
-import com.ble.view.LKAlertDialog;
 
 public class RegistrationActivity extends BaseActivity implements OnClickListener {
 
@@ -22,6 +27,8 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 	private EditText pwdText = null;
 	private Button regiButton = null;
 	private Button backButton = null;
+
+	private static boolean mScanning;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,7 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 		this.backButton = (Button) this.findViewById(R.id.btn_back);
 		this.backButton.setOnClickListener(this);
 
+		// this.deviceNumText.setText("BLE CARD:12345678901234567890");
 		this.pwdText.setText("22334455");
 	}
 
@@ -49,6 +57,14 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 		} else if (pwdText.getText().length() < 4) {
 			Toast.makeText(this, "认证号不能少于4位。", Toast.LENGTH_SHORT).show();
 			return false;
+		}
+
+		HashSet<String> devices = (HashSet<String>) ApplicationEnvironment.getInstance().getPreferences().getStringSet(Constants.MY_DEVICELIST, new HashSet<String>());
+		for (Iterator<String> it = devices.iterator(); it.hasNext();) {
+			if (it.next().split("&")[0].equalsIgnoreCase(BLEUtil.getSimpleDeviceName(this.deviceNumText.getText().toString()))) {
+				BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "该设备已经注册！");
+				return false;
+			}
 		}
 
 		return true;
@@ -70,8 +86,68 @@ public class RegistrationActivity extends BaseActivity implements OnClickListene
 			editor.putString(Constants.SECURITY_KEY, md5Str);
 			editor.commit();
 
-			BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "注册成功，密钥已生成。");
+			matchBLEDevice();
 		}
 	}
-	
+
+	private void matchBLEDevice() {
+		BaseActivity.getTopActivity().showDialog(BaseActivity.PROGRESS_DIALOG, "请触发设备...");
+
+		scanLeDevice(true);
+	}
+
+	private void scanLeDevice(boolean enable) {
+		Handler mHandler = new Handler();
+
+		if (enable) {
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mScanning = false;
+					BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
+				}
+			}, Constants.SCAN_PERIOD);
+
+			mScanning = true;
+			BLEUtil.getBluetoothAdapter().startLeScan(mLeScanCallback);
+		} else {
+			mScanning = false;
+			BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
+		}
+	}
+
+	// BLE设备的搜索结果将通过这个callback返回
+	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+
+		@Override
+		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+			Log.e("===", device.getName() + "---" + device.getAddress());
+
+			String deviceName = BLEUtil.getSimpleDeviceName(device.getName());
+			String matchName = BLEUtil.getSimpleDeviceName(deviceNumText.getText().toString());
+
+			mScanning = false;
+			BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
+
+			if (deviceName.equals(matchName)) {
+				HashSet<String> deviceSet = (HashSet<String>) ApplicationEnvironment.getInstance().getPreferences().getStringSet(Constants.MY_DEVICELIST, new HashSet<String>());
+				deviceSet.add(deviceName + "&" + device.getAddress());
+
+				Editor editor = ApplicationEnvironment.getInstance().getPreferences().edit();
+				editor.putStringSet(Constants.MY_DEVICELIST, deviceSet);
+				editor.commit();
+				
+				BLEUtil.resetDeviceSet();
+
+				BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "注册成功，设备已添加。");
+				
+			} else {
+				BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "注册失败，不能匹配设备。");
+			}
+
+			BaseActivity.getTopActivity().hideDialog(BaseActivity.PROGRESS_DIALOG);
+
+		}
+	};
+
 }

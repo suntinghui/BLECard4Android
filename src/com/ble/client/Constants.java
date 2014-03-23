@@ -19,8 +19,12 @@ public class Constants {
 	public final static String ACTION_GATT_DESCRIPTOR_WRITED				= "ACTION_GATT_DESCRIPTOR_WRITED";
 	public final static String ACTION_DATA_AVAILABLE 						= "ACTION_DATA_AVAILABLE";
 	
+	public static int SCAN_PERIOD 											= 10000;
 	
 	public final static String SECURITY_KEY									= "SECURITY_KEY";
+	
 	public final static String DEVICENAME_PRE								= "BLE CARD";
+	
+	public final static String MY_DEVICELIST								= "MY_DEVICELIST";
 	
 }

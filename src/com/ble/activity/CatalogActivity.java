@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ble.R;
+import com.ble.client.BLEUtil;
 
 @SuppressLint("CommitPrefEdits")
 public class CatalogActivity extends BaseActivity {
@@ -122,18 +123,26 @@ public class CatalogActivity extends BaseActivity {
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 			switch (arg2) {
 			case 0:
-				Intent intent0 = new Intent(CatalogActivity.this, QueryBalanceActivity.class);
-				startActivity(intent0);
+				if (CatalogActivity.this.checkRegiDevice()) {
+					Intent intent0 = new Intent(CatalogActivity.this, QueryBalanceActivity.class);
+					startActivity(intent0);
+				}
 				break;
 
 			case 1:
-				Intent intent1 = new Intent(CatalogActivity.this, RechargeActivity.class);
-				startActivity(intent1);
+				if (CatalogActivity.this.checkRegiDevice()) {
+					Intent intent1 = new Intent(CatalogActivity.this, RechargeActivity.class);
+					startActivity(intent1);
+				}
+
 				break;
 
 			case 2:
-				Intent intent2 = new Intent(CatalogActivity.this, QueryTransHistoryActivity.class);
-				startActivity(intent2);
+				if (CatalogActivity.this.checkRegiDevice()) {
+					Intent intent2 = new Intent(CatalogActivity.this, QueryTransHistoryActivity.class);
+					startActivity(intent2);
+				}
+
 				break;
 
 			case 3:
@@ -149,6 +158,16 @@ public class CatalogActivity extends BaseActivity {
 		}
 
 	};
+
+	private boolean checkRegiDevice() {
+		if (BLEUtil.getMyDeviceSet().isEmpty()) {
+			BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "您尚未注册设备，请您先添加设备。");
+
+			return false;
+		}
+
+		return true;
+	}
 
 	// 程序退出
 	@Override

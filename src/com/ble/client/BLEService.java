@@ -16,6 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.ble.activity.BaseActivity;
 import com.ble.util.ByteUtil;
 
 public class BLEService extends Service {
@@ -55,28 +56,33 @@ public class BLEService extends Service {
 
 	public boolean connect() {
 		Log.e(TAG, "开始尝试连接设备...");
-		
-		//this.disconnect();
-		
-		Log.e(TAG, "××××××××××××××××××××××××××××××");
-		
+
+		// this.disconnect();
+
 		if (null == mBluetoothAdapter) {
 			mBluetoothAdapter = BLEUtil.getBluetoothAdapter();
 		}
-		
-		String address = BLEUtil.getMyDevice().getAddress();
-		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-		mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-		mConnectionState = STATE_CONNECTING;
-		
-		return true;
+
+		BluetoothDevice device = BLEUtil.getMyDevice();
+		if (device != null) {
+			// BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+			mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+			mConnectionState = STATE_CONNECTING;
+
+			return true;
+
+		} else {
+			BaseActivity.getTopActivity().showDialog(BaseActivity.MODAL_DIALOG, "未找到匹配的设备！");
+
+			return false;
+		}
 	}
 
 	public void disconnect() {
 		if (mBluetoothAdapter == null || mBluetoothGatt == null) {
 			return;
 		}
-		
+
 		mBluetoothGatt.disconnect();
 	}
 
@@ -85,7 +91,7 @@ public class BLEService extends Service {
 			return;
 		}
 
-//		mBluetoothGatt.disconnect();
+		// mBluetoothGatt.disconnect();
 		mBluetoothGatt.close();
 		mBluetoothGatt = null;
 	}
@@ -96,7 +102,7 @@ public class BLEService extends Service {
 		identifiedCharacter_write.setValue(value);
 
 		boolean status = mBluetoothGatt.writeCharacteristic(identifiedCharacter_write);
-		Log.e("writeCharacteristic", status?"写成功！":"写失败！");
+		Log.e("writeCharacteristic", status ? "写成功！" : "写失败！");
 		return status;
 	}
 
@@ -106,19 +112,19 @@ public class BLEService extends Service {
 			Log.e(TAG, "onConnectionStateChange");
 
 			String intentAction;
-			
+
 			if (newState == BluetoothProfile.STATE_CONNECTING) {
 				intentAction = Constants.ACTION_GATT_CONNECTING;
 				mConnectionState = STATE_CONNECTING;
 				Log.e(TAG, "Connecting to GATT server");
-				
+
 				broadcastUpdate(intentAction);
-				
+
 			} else if (newState == BluetoothProfile.STATE_CONNECTED) {
 				intentAction = Constants.ACTION_GATT_CONNECTED;
 				mConnectionState = STATE_CONNECTED;
 				Log.e(TAG, "Connected to GATT server.");
-				
+
 				broadcastUpdate(intentAction);
 
 				// 开始查找服务
@@ -138,7 +144,7 @@ public class BLEService extends Service {
 			Log.e(TAG, "onServicesDiscovered-" + status);
 
 			if (status == BluetoothGatt.GATT_SUCCESS) {
-				
+
 				identifiedService = mBluetoothGatt.getService(UUID.fromString(Constants.SERVICE_UUID));
 				if (identifiedService == null) {
 					Log.e(TAG, "没有找到指定的Service！！！");
@@ -155,7 +161,7 @@ public class BLEService extends Service {
 				if (identifiedCharacter_notify == null) {
 					Log.e(TAG, "在服务中没有找到指定的Characteristic notify！！！");
 				}
-				
+
 				broadcastUpdate(Constants.ACTION_GATT_SERVICES_DISCOVERED);
 
 			} else {

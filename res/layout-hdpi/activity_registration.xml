@@ -51,6 +51,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="10dip"
                 android:background="@null"
+                android:text="BLE CARD:"
                 android:hint="请输入设备名称" />
         </LinearLayout>
 

@@ -1,6 +1,7 @@
 package com.ble.client;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,16 +17,29 @@ public class BLEUtil {
 
 	private static boolean mScanning;
 	private static Handler mHandler;
-	private static int SCAN_PERIOD = 10000;
 
-	private static ArrayList<BluetoothDevice> deviceList = null;
+	private static BluetoothDevice myDevice = null;
+
+	private static HashSet<String> myDeviceSet = null;
 
 	// 判断设备是否支持蓝牙
 	public static boolean isSupportBLE() {
 		return ApplicationEnvironment.getInstance().getApplication().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
 	}
+
+	public static HashSet<String> getMyDeviceSet() {
+		if (myDeviceSet == null) {
+			myDeviceSet = (HashSet<String>) ApplicationEnvironment.getInstance().getPreferences().getStringSet(Constants.MY_DEVICELIST, new HashSet<String>());
+		}
+
+		return myDeviceSet;
+	}
 	
-	public static BluetoothManager getBluetoothManager(){
+	public static void resetDeviceSet(){
+		myDeviceSet = null;
+	}
+
+	public static BluetoothManager getBluetoothManager() {
 		BluetoothManager bluetoothManager = (BluetoothManager) ApplicationEnvironment.getInstance().getApplication().getSystemService(Context.BLUETOOTH_SERVICE);
 		return bluetoothManager;
 	}
@@ -44,7 +58,7 @@ public class BLEUtil {
 	// 2、不要循环搜索设备，为每次搜索设置适合的时间限制。避免设备不在可用范围的时候持续不停扫描，消耗电量。
 	private static void scanLeDevice(boolean enable) {
 		mHandler = new Handler();
-		
+
 		if (enable) {
 			// Stops scanning after a pre-defined scan period.
 			// 使用PostDelayed方法，两秒后调用此Runnable对象，停止扫描。
@@ -54,7 +68,7 @@ public class BLEUtil {
 					mScanning = false;
 					BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
 				}
-			}, SCAN_PERIOD);
+			}, Constants.SCAN_PERIOD);
 
 			mScanning = true;
 			BLEUtil.getBluetoothAdapter().startLeScan(mLeScanCallback);
@@ -70,20 +84,20 @@ public class BLEUtil {
 
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-			Log.e("===", device.getName()+"---"+device.getAddress());
-			
-			if (device.getName().contains(Constants.DEVICENAME_PRE)) {
-				deviceList.add(device);
+			Log.e("===", device.getName() + "---" + device.getAddress());
 
-				mScanning = false;
-				BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
+			for (Iterator<String> it = getMyDeviceSet().iterator(); it.hasNext();) {
+				if (it.next().split("&")[0].equalsIgnoreCase(BLEUtil.getSimpleDeviceName(device.getName()))) {
+					myDevice = device;
+
+					mScanning = false;
+					BLEUtil.getBluetoothAdapter().stopLeScan(mLeScanCallback);
+				}
 			}
 		}
 	};
 
-	private static ArrayList<BluetoothDevice> getDevices() {
-		deviceList = new ArrayList<BluetoothDevice>();
-
+	public static BluetoothDevice getMyDevice() {
 		scanLeDevice(true);
 
 		while (mScanning) {
@@ -94,17 +108,11 @@ public class BLEUtil {
 			}
 		}
 
-		return deviceList;
+		return myDevice;
 	}
 
-	public static BluetoothDevice getMyDevice() {
-		ArrayList<BluetoothDevice> list = getDevices();
-		for (BluetoothDevice device : list) {
-			if (device.getName().contains(Constants.DEVICENAME_PRE)) {
-				return device;
-			}
-		}
-
-		return null;
+	public static String getSimpleDeviceName(String deviceName) {
+		// BLE CARD:12345678901234567890 -> BLECARD12345678901234567890
+		return deviceName.replace(" ", "").replace(":", "").replace("：", "").toUpperCase().trim();
 	}
 }
